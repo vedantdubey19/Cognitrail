@@ -1,0 +1,11 @@
+{
+  "name": "cognitrail-browser-tests",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test:browser": "node --test tests/browser.test.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

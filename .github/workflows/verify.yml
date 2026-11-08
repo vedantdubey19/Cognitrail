@@ -1,0 +1,26 @@
+name: verify
+on: [push, pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.11'
+      - run: uv sync --frozen --extra dev
+      - run: uv run ruff check .
+      - run: uv run pytest -q
+      - run: uv run pip-audit --local
+      - run: docker build -t cognitrail:test -t cognitrail:private .
+      - run: docker run --rm --cap-drop ALL --security-opt no-new-privileges --memory 512m --pids-limit 100 cognitrail:test python -m scripts.check_container
+      - run: uv run python -m scripts.check_private
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

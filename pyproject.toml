@@ -1,0 +1,21 @@
+[project]
+name = "cognitrail"
+version = "0.1.0"
+description = "Agentic research with traceable evidence and bounded tools"
+requires-python = ">=3.11"
+dependencies = ["fastapi>=0.115,<1", "uvicorn>=0.30,<1", "pydantic-settings>=2.6,<3", "sqlalchemy>=2,<3", "psycopg[binary]>=3,<4", "langgraph>=1,<2", "httpx>=0.28,<1", "beautifulsoup4>=4.12,<5", "python-multipart>=0.0.18", "pymupdf>=1.26,<2"]
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "ruff>=0.9,<1", "pip-audit>=2.10,<3"]
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+[tool.setuptools]
+packages = ["app"]
+[tool.setuptools.package-data]
+app = ["web/*"]
+[tool.pytest.ini_options]
+pythonpath = ["."]
+[tool.ruff]
+line-length = 100
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]

@@ -1,0 +1,8 @@
+.env
+.env.*
+.venv
+.runtime
+.git
+.artifacts
+__pycache__
+.pytest_cache

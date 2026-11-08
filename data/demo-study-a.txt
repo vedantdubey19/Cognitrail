@@ -1,0 +1,6 @@
+Synthetic Research Note A — Hybrid Retrieval
+This is invented demonstration material, not a scientific study.
+Hybrid retrieval combines keyword matching and semantic vector search to improve evidence coverage.
+Hybrid retrieval achieved 82 percent answer accuracy on the synthetic document benchmark with a fixed evaluation protocol.
+Hybrid retrieval introduces extra ranking latency because multiple candidate lists must be combined.
+Reranking can improve relevance but consumes more compute and requires representative evaluation queries.

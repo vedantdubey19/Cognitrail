@@ -1,0 +1,6 @@
+Synthetic Research Note B — Hybrid Retrieval
+This is invented demonstration material, not a scientific study.
+Hybrid retrieval combines keyword matching and semantic vector search to improve evidence coverage.
+Hybrid retrieval achieved 79 percent answer accuracy on the synthetic document benchmark with a fixed evaluation protocol.
+Citation checks confirm that evidence identifiers exist, but do not prove that an answer follows from its sources.
+Small evaluation datasets can underestimate retrieval failures and distort conclusions about generalization.

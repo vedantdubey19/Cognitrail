@@ -1,0 +1,62 @@
+services:
+  research:
+    image: cognitrail:private
+    build: .
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp:size=256m,mode=1777]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 128
+    mem_limit: 1g
+    cpus: 2
+    environment:
+      COGNITRAIL_DEPLOYMENT: private
+      COGNITRAIL_PUBLIC_URL: https://${DOMAIN:?Set DOMAIN}
+      COGNITRAIL_GATEWAY_SECRET: ${COGNITRAIL_GATEWAY_SECRET:?Generate a gateway secret}
+      COGNITRAIL_PROVIDER: ${COGNITRAIL_PROVIDER:-extractive}
+      COGNITRAIL_MODEL: ${COGNITRAIL_MODEL:-extractive-v1}
+      COGNITRAIL_GEMINI_API_KEY: ${COGNITRAIL_GEMINI_API_KEY:-}
+      COGNITRAIL_BRAVE_API_KEY: ${COGNITRAIL_BRAVE_API_KEY:-}
+      COGNITRAIL_DATABASE_URL: sqlite:////workspace/.runtime/cognitrail.db
+      COGNITRAIL_DATA_DIR: /workspace/.runtime
+    volumes: [research-data:/workspace/.runtime]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8100/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options: {max-size: 10m, max-file: '3'}
+  gateway:
+    image: caddy:2.10-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d
+    restart: unless-stopped
+    ports: ['80:80', '443:443']
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN}
+      TLS_EMAIL: ${TLS_EMAIL:?Set TLS_EMAIL}
+      DASHBOARD_USER: ${DASHBOARD_USER:-owner}
+      DASHBOARD_PASSWORD_HASH: ${DASHBOARD_PASSWORD_HASH:?Generate a bcrypt password hash}
+      COGNITRAIL_GATEWAY_SECRET: ${COGNITRAIL_GATEWAY_SECRET:?Generate a gateway secret}
+    volumes:
+      - type: bind
+        source: ./deploy/Caddyfile
+        target: /etc/caddy/Caddyfile
+        read_only: true
+        bind: {create_host_path: false}
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      research: {condition: service_healthy}
+    security_opt: [no-new-privileges:true]
+    mem_limit: 256m
+    pids_limit: 100
+    logging:
+      driver: json-file
+      options: {max-size: 10m, max-file: '3'}
+volumes:
+  research-data:
+  caddy-data:
+  caddy-config:

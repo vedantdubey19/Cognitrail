@@ -1,0 +1,32 @@
+{
+    email {$TLS_EMAIL}
+    admin off
+    servers {
+        timeouts {
+            read_header 10s
+            read_body 30s
+            idle 2m
+        }
+    }
+}
+{$DOMAIN} {
+    header {
+        Strict-Transport-Security "max-age=31536000"
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy no-referrer
+        Cache-Control no-store
+        -Server
+    }
+    request_body {
+        max_size 6MB
+    }
+    basic_auth {
+        {$DASHBOARD_USER} {$DASHBOARD_PASSWORD_HASH}
+    }
+    reverse_proxy research:8100 {
+        # Replace client input. This secret is never sent to the browser.
+        header_up X-Cognitrail-Gateway {$COGNITRAIL_GATEWAY_SECRET}
+        header_up -Authorization
+    }
+}
